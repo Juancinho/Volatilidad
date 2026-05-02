@@ -1,21 +1,11 @@
 # Aplicación del paper arXiv:2604.24480 a la construcción de superficies de volatilidad implícita
 
-Este repositorio desarrolla una aplicación práctica del resultado presentado por
-Wolfgang Schadner en `An Explicit Solution to Black-Scholes Implied Volatility`
-arXiv:2604.24480v1. El paper propone una forma explícita de invertir la fórmula de
-Black-Scholes y obtener la volatilidad implícita mediante el cuantil de una distribución
-Gaussiana Inversa. La motivación de este proyecto es llevar ese resultado desde su
-formulación matemática a un caso empírico: calcular volatilidades implícitas con datos
-reales de mercado y organizar esas volatilidades en una superficie de volatilidad.
+Este repositorio desarrolla una aplicación práctica del resultado presentado por Wolfgang Schadner en `An Explicit Solution to Black-Scholes Implied Volatility` arXiv:2604.24480v1. El paper propone una forma explícita de invertir la fórmula de Black-Scholes y obtener la volatilidad implícita mediante el cuantil de una distribución Gaussiana Inversa. La motivación de este proyecto es llevar ese resultado desde su formulación matemática a un caso empírico: calcular volatilidades implícitas con datos reales de mercado y organizar esas volatilidades en una superficie de volatilidad.
 
-La aplicación descarga cadenas de opciones desde Yahoo Finance, transforma los precios
-observados en volatilidades implícitas usando la fórmula explícita del paper y representa
-la estructura resultante en varios formatos: superficie 3D, mapa de calor, sonrisas por
-vencimiento, estructura temporal e índice de skew.
+La aplicación descarga cadenas de opciones desde Yahoo Finance, transforma los precios observados en volatilidades implícitas usando la fórmula explícita del paper y representa la estructura resultante en varios formatos: superficie 3D, mapa de calor, smiles por vencimiento, estructura temporal e índice de skew.
 
 El objetivo no es sustituir una plataforma profesional de valoración, sino mostrar de
-forma transparente cómo un resultado teórico reciente puede aplicarse al análisis de una
-cadena de opciones real. La aplicación mantiene visible el flujo completo:
+forma transparente cómo un resultado teórico reciente puede aplicarse al análisis de una cadena de opciones real. La aplicación mantiene visible el flujo completo:
 
 ```text
 Precio de opción
@@ -29,26 +19,18 @@ Precio de opción
 
 ## Motivación
 
-El punto de partida del proyecto es una cuestión clásica en finanzas cuantitativas:
-Black-Scholes proporciona el precio de una opción si se conoce la volatilidad, pero en
-mercado ocurre lo contrario. Lo observable es el precio de la opción; la volatilidad debe
-inferirse.
+El punto de partida del proyecto es una cuestión clásica en finanzas cuantitativas: Black-Scholes proporciona el precio de una opción si se conoce la volatilidad, pero en mercado ocurre lo contrario. Lo observable es el precio de la opción; la volatilidad debe inferirse.
 
-Formalmente, dada una opción con precio de mercado `C_mercado`, se busca la volatilidad
-`sigma` que satisface:
+Formalmente, dada una opción con precio de mercado `C_mercado`, se busca la volatilidad `sigma` que satisface:
 
 ```math
 C_{BS}(\sigma) = C_{mercado}
 ```
 
-Esa `sigma` es la volatilidad implícita. Durante décadas, esta inversión se ha tratado
-como un problema numérico. En la práctica, se resolvía mediante algoritmos iterativos:
+Esa `sigma` es la volatilidad implícita. Durante décadas, esta inversión se ha tratado como un problema numérico. En la práctica, se resolvía mediante algoritmos iterativos:
 Newton-Raphson, bisección, métodos de Householder o aproximaciones racionales.
 
-El interés del paper de Schadner es que reformula el problema. En lugar de buscar la raíz
-de una ecuación no lineal, identifica una relación exacta entre el precio Black-Scholes
-normalizado y la función de distribución de una Gaussiana Inversa. Al invertir esa CDF,
-la volatilidad queda expresada directamente mediante una función cuantil.
+El interés del paper de Schadner es que reformula el problema. En lugar de buscar la raíz de una ecuación no lineal, identifica una relación exacta entre el precio Black-Scholes normalizado y la función de distribución de una Gaussiana Inversa. Al invertir esa CDF, la volatilidad queda expresada directamente mediante una función cuantil.
 
 La pregunta natural que motiva esta aplicación es:
 
@@ -57,8 +39,7 @@ La pregunta natural que motiva esta aplicación es:
 > opciones?
 
 La aplicación responde a esa pregunta. Para cada opción válida, calcula una IV explícita.
-Después, al repetir el procedimiento sobre muchos strikes y vencimientos, se obtiene una
-nube de puntos que aproxima la superficie empírica de volatilidad.
+Después, al repetir el procedimiento sobre muchos strikes y vencimientos, se obtiene una nube de puntos que aproxima la superficie empírica de volatilidad.
 
 ## Por qué estudiar la superficie de volatilidad
 
@@ -149,44 +130,31 @@ Cadena de opciones
 La aplicación principal está contenida en `streamlit_app.py`. El código está organizado
 en bloques funcionales:
 
-| Bloque | Función |
-|---|---|
-| Configuración de página | Define layout, tema visual y estilos CSS. |
-| Fórmula cerrada IV | Implementa la inversión explícita mediante `invgauss.ppf`. |
-| Descarga de datos | Obtiene spot, vencimientos y cadenas de opciones con `yfinance`. |
-| Limpieza de contratos | Filtra precios inválidos, vencimientos no deseados y contratos ilíquidos. |
-| Cálculo de IV y Greeks | Calcula `iv`, `delta`, `gamma` y `vega` para cada opción. |
-| Estructura temporal | Interpola ATM, 25-delta y 10-delta por vencimiento. |
-| Figuras Plotly | Construye superficie 3D, heatmap, smiles, skew y term structure. |
-| Interfaz Streamlit | Organiza la app en pestañas, métricas, filtros y explicaciones. |
+| Bloque                  | Función                                                                   |
+| ----------------------- | ------------------------------------------------------------------------- |
+| Configuración de página | Define layout, tema visual y estilos CSS.                                 |
+| Fórmula cerrada IV      | Implementa la inversión explícita mediante `invgauss.ppf`.                |
+| Descarga de datos       | Obtiene spot, vencimientos y cadenas de opciones con `yfinance`.          |
+| Limpieza de contratos   | Filtra precios inválidos, vencimientos no deseados y contratos ilíquidos. |
+| Cálculo de IV y Greeks  | Calcula `iv`, `delta`, `gamma` y `vega` para cada opción.                 |
+| Estructura temporal     | Interpola ATM, 25-delta y 10-delta por vencimiento.                       |
+| Figuras Plotly          | Construye superficie 3D, heatmap, smiles, skew y term structure.          |
+| Interfaz Streamlit      | Organiza la app en pestañas, métricas, filtros y explicaciones.           |
 
 Funciones principales:
 
-| Función | Descripción |
-|---|---|
-| `iv_closed_form(C, K, F, D, T)` | Calcula IV explícita de una call. |
-| `iv_from_put(P, K, F, D, T)` | Convierte un put en call sintética y calcula IV. |
-| `fetch_options_data(ticker, risk_free_rate, max_T)` | Descarga, filtra y transforma la cadena de opciones. |
-| `compute_term_structure(df)` | Construye ATM IV, 25-delta IV, 10-delta IV y skew por vencimiento. |
-| `fig_3d_surface(df)` | Dibuja nube de puntos e interpolación 3D. |
-| `fig_iv_heatmap(df)` | Dibuja la superficie vista desde arriba. |
-| `fig_iv_smile_moneyness(df, selected)` | Dibuja smiles en log-moneyness. |
-| `fig_iv_smile_delta(df, selected)` | Dibuja smiles en espacio delta. |
-| `fig_term_structure(term_df)` | Dibuja estructura temporal. |
-| `fig_skew_index(term_df)` | Dibuja índice de skew por vencimiento. |
-
-## Estructura del repositorio
-
-```text
-.
-├── streamlit_app.py               # Aplicación principal de Streamlit
-├── streamlit_app_explicado.md     # Explicación técnica detallada del código
-├── vol_surface.py                 # Script auxiliar para superficie de volatilidad
-├── vol_surface_explained.md       # Explicación previa de la metodología
-├── volatilidad_implicita.tex      # Apuntes teóricos en LaTeX
-├── spy_iv_dashboard.png           # Ejemplo de salida visual
-└── README.md                      # Este documento
-```
+| Función                                             | Descripción                                                        |
+| --------------------------------------------------- | ------------------------------------------------------------------ |
+| `iv_closed_form(C, K, F, D, T)`                     | Calcula IV explícita de una call.                                  |
+| `iv_from_put(P, K, F, D, T)`                        | Convierte un put en call sintética y calcula IV.                   |
+| `fetch_options_data(ticker, risk_free_rate, max_T)` | Descarga, filtra y transforma la cadena de opciones.               |
+| `compute_term_structure(df)`                        | Construye ATM IV, 25-delta IV, 10-delta IV y skew por vencimiento. |
+| `fig_3d_surface(df)`                                | Dibuja nube de puntos e interpolación 3D.                          |
+| `fig_iv_heatmap(df)`                                | Dibuja la superficie vista desde arriba.                           |
+| `fig_iv_smile_moneyness(df, selected)`              | Dibuja smiles en log-moneyness.                                    |
+| `fig_iv_smile_delta(df, selected)`                  | Dibuja smiles en espacio delta.                                    |
+| `fig_term_structure(term_df)`                       | Dibuja estructura temporal.                                        |
+| `fig_skew_index(term_df)`                           | Dibuja índice de skew por vencimiento.                             |
 
 ## Instalación
 
@@ -226,27 +194,27 @@ http://localhost:8501
 
 La barra lateral permite configurar:
 
-| Parámetro | Descripción |
-|---|---|
-| Activo rápido | Selector de tickers predefinidos. |
-| Ticker manual | Campo para introducir cualquier ticker compatible con Yahoo Finance. |
-| Tasa libre de riesgo | Tasa continua usada para calcular descuento y forward. |
-| Máximo vencimiento | Horizonte máximo de expiración incluido en la muestra. |
+| Parámetro            | Descripción                                                          |
+| -------------------- | -------------------------------------------------------------------- |
+| Activo rápido        | Selector de tickers predefinidos.                                    |
+| Ticker manual        | Campo para introducir cualquier ticker compatible con Yahoo Finance. |
+| Tasa libre de riesgo | Tasa continua usada para calcular descuento y forward.               |
+| Máximo vencimiento   | Horizonte máximo de expiración incluido en la muestra.               |
 
 Tickers recomendados:
 
-| Ticker | Descripción |
-|---|---|
-| `SPY` | ETF del S&P 500, muy líquido. |
-| `QQQ` | ETF del Nasdaq 100. |
-| `IWM` | ETF del Russell 2000. |
-| `GLD` | ETF de oro. |
-| `TLT` | ETF de bonos de largo plazo. |
-| `FXE` | ETF proxy EUR/USD. |
-| `FXY` | ETF proxy JPY/USD. |
-| `FXB` | ETF proxy GBP/USD. |
-| `FXA` | ETF proxy AUD/USD. |
-| `UUP` | ETF del índice dólar estadounidense. |
+| Ticker | Descripción                          |
+| ------ | ------------------------------------ |
+| `SPY`  | ETF del S&P 500, muy líquido.        |
+| `QQQ`  | ETF del Nasdaq 100.                  |
+| `IWM`  | ETF del Russell 2000.                |
+| `GLD`  | ETF de oro.                          |
+| `TLT`  | ETF de bonos de largo plazo.         |
+| `FXE`  | ETF proxy EUR/USD.                   |
+| `FXY`  | ETF proxy JPY/USD.                   |
+| `FXB`  | ETF proxy GBP/USD.                   |
+| `FXA`  | ETF proxy AUD/USD.                   |
+| `UUP`  | ETF del índice dólar estadounidense. |
 
 Yahoo Finance normalmente no proporciona cadenas gratuitas de opciones OTC sobre pares
 spot como `EURUSD=X`. Por eso, para FX se usan ETFs de divisas con opciones listadas.
@@ -285,11 +253,11 @@ Esta elección tiene ventajas importantes:
 
 ### Interpretación de los ejes
 
-| Eje | Variable | Interpretación |
-|---|---|---|
-| X | `log-moneyness = ln(K/F)` | Posición relativa del strike frente al forward. |
-| Y | `T` | Tiempo al vencimiento en años. |
-| Z | `IV` | Volatilidad implícita anualizada. |
+| Eje | Variable                  | Interpretación                                  |
+| --- | ------------------------- | ----------------------------------------------- |
+| X   | `log-moneyness = ln(K/F)` | Posición relativa del strike frente al forward. |
+| Y   | `T`                       | Tiempo al vencimiento en años.                  |
+| Z   | `IV`                      | Volatilidad implícita anualizada.               |
 
 Un punto de la superficie representa una opción concreta:
 
@@ -345,11 +313,11 @@ T \mapsto \sigma_{imp}(k_0,T)
 La estructura temporal permite analizar si el mercado asigna más prima de volatilidad al
 corto o al largo plazo.
 
-| Forma | Interpretación |
-|---|---|
-| Contango | La IV aumenta con el plazo. |
-| Backwardation | La IV corta supera a la IV larga. |
-| Curva plana | El mercado no diferencia mucho entre plazos. |
+| Forma         | Interpretación                               |
+| ------------- | -------------------------------------------- |
+| Contango      | La IV aumenta con el plazo.                  |
+| Backwardation | La IV corta supera a la IV larga.            |
+| Curva plana   | El mercado no diferencia mucho entre plazos. |
 
 Una backwardation marcada suele asociarse a tensión de corto plazo, aunque su lectura
 debe contrastarse con liquidez, calendario de eventos y calidad de datos.
@@ -360,13 +328,13 @@ debe contrastarse con liquidez, calendario de eventos y calidad de datos.
 
 Para cada contrato de opción se toman:
 
-| Variable | Descripción |
-|---|---|
-| `S` | Precio spot del subyacente. |
-| `K` | Strike de la opción. |
-| `T` | Tiempo al vencimiento en años. |
-| `r` | Tasa libre de riesgo continua. |
-| `P` | Precio del put, preferentemente mid-price. |
+| Variable | Descripción                                |
+| -------- | ------------------------------------------ |
+| `S`      | Precio spot del subyacente.                |
+| `K`      | Strike de la opción.                       |
+| `T`      | Tiempo al vencimiento en años.             |
+| `r`      | Tasa libre de riesgo continua.             |
+| `P`      | Precio del put, preferentemente mid-price. |
 
 El precio usado para cada put es:
 
@@ -415,10 +383,10 @@ Esta coordenada tiene varias ventajas:
 Interpretación:
 
 | Condición | Log-moneyness | Interpretación para puts |
-|---|---:|---|
-| `K = F` | `k = 0` | At-the-forward. |
-| `K < F` | `k < 0` | Put OTM. |
-| `K > F` | `k > 0` | Put ITM. |
+| --------- | -------------:| ------------------------ |
+| `K = F`   | `k = 0`       | At-the-forward.          |
+| `K < F`   | `k < 0`       | Put OTM.                 |
+| `K > F`   | `k > 0`       | Put ITM.                 |
 
 Ejemplo:
 
@@ -652,12 +620,12 @@ Skew(T)=\sigma_{25\Delta}(T)-\sigma_{ATM}(T)
 
 Interpretación general:
 
-| Forma | Lectura |
-|---|---|
-| Contango | La IV aumenta con el vencimiento. |
-| Backwardation | La IV corta supera a la IV larga. |
-| Curva plana | El mercado no diferencia de forma marcada el riesgo por plazo. |
-| Skew elevado | Los puts OTM incorporan una prima significativa frente al ATM. |
+| Forma         | Lectura                                                        |
+| ------------- | -------------------------------------------------------------- |
+| Contango      | La IV aumenta con el vencimiento.                              |
+| Backwardation | La IV corta supera a la IV larga.                              |
+| Curva plana   | El mercado no diferencia de forma marcada el riesgo por plazo. |
+| Skew elevado  | Los puts OTM incorporan una prima significativa frente al ATM. |
 
 ## Cálculo de Greeks
 
